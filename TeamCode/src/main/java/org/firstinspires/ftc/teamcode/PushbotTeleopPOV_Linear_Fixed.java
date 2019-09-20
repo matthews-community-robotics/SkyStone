@@ -50,7 +50,7 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Pushbot: Teleop POV", group="Pushbot")
+@TeleOp(name="Dual Joystick Movement", group="Pushbot")
 
 public class PushbotTeleopPOV_Linear_Fixed extends LinearOpMode {
 
@@ -79,6 +79,15 @@ public class PushbotTeleopPOV_Linear_Fixed extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
+        /*  telemetry.addData("JoystickL", gamepad1.left_stick_x + ", " + gamepad1.left_stick_y);
+            telemetry.addData("JoystickR", gamepad1.right_stick_x + ", " + gamepad1.right_stick_y);
+            telemetry.addData("Start", gamepad1.start);
+            telemetry.addData("A Button", gamepad1.a);
+            telemetry.addData("B Button", gamepad1.b);
+            telemetry.addData("Y Button", gamepad1.y);
+            telemetry.addData("X Button", gamepad1.x);
+         */
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
@@ -86,7 +95,7 @@ public class PushbotTeleopPOV_Linear_Fixed extends LinearOpMode {
             // In this mode the Left stick moves the robot fwd and back, the Right stick turns left and right.
             // This way it's also easy to just drive straight, or just turn.
             drive = gamepad1.left_stick_y * 0.45;
-            turn  =  gamepad1.right_stick_x * 0.5;
+            turn  =  -gamepad1.right_stick_x * 0.35;
 
             // Combine drive and turn for blended motion.
             left  = drive + turn;
