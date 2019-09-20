@@ -38,7 +38,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  *
  * This class can be used to define all the specific hardware for a single robot.
  * In this case that robot is a Pushbot.
- * See PushbotTeleopTank_Iterative and others classes starting with "Pushbot" for usage examples.
  *
  * This hardware class assumes the following device names have been configured on the robot:
  * Note:  All names are lower case and some have single spaces between words.
