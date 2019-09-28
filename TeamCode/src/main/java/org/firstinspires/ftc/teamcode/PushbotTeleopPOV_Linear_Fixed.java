@@ -66,7 +66,8 @@ public class PushbotTeleopPOV_Linear_Fixed extends LinearOpMode {
         double drive;
         double turn;
         double max;
-
+        double ArmDrive;
+        double ArmSpeed = 4;
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
          */
@@ -96,6 +97,24 @@ public class PushbotTeleopPOV_Linear_Fixed extends LinearOpMode {
             // This way it's also easy to just drive straight, or just turn.
             drive = gamepad1.left_stick_y * 0.45;
             turn  =  -gamepad1.right_stick_x * 0.35;
+
+            if(gamepad1.dpad_up){
+                ArmDrive = ArmSpeed;
+            } else if(gamepad1.dpad_down){
+                ArmDrive = -ArmSpeed;
+            }else{
+                ArmDrive = 0;
+            }
+            robot.armMotor.setPower(ArmDrive);
+
+            if(gamepad1.left_bumper){
+                robot.leftClaw.setPosition(0);
+                robot.rightClaw.setPosition(0);
+            }
+            if(gamepad1.right_bumper){
+                robot.leftClaw.setPosition(1);
+                robot.rightClaw.setPosition(1);
+            }
 
             // Combine drive and turn for blended motion.
             left  = drive + turn;
@@ -139,6 +158,8 @@ public class PushbotTeleopPOV_Linear_Fixed extends LinearOpMode {
             telemetry.addData("left",  "%.2f", left);
             telemetry.addData("right", "%.2f", right);
             telemetry.addData("Left Stick X", gamepad1.left_stick_x);
+            telemetry.addData("Left Claw: ", robot.leftClaw.getPosition());
+            telemetry.addData("Right Claw: ", robot.rightClaw.getPosition());
             telemetry.update();
 
             // Pace this loop so jaw action is reasonable speed.
