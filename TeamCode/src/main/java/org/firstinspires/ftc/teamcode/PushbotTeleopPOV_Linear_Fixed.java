@@ -96,26 +96,24 @@ public class PushbotTeleopPOV_Linear_Fixed extends LinearOpMode {
             // In this mode the Left stick moves the robot fwd and back, the Right stick turns left and right.
             // This way it's also easy to just drive straight, or just turn.
             drive = gamepad1.left_stick_y * 0.45;
-            if(gamepad1.right_stick_x < 0) {
-                turn  =  -gamepad1.right_stick_x * 0.65;
-            }else{
-                turn  =  -gamepad1.right_stick_x * 0.55;
-            }
+            turn  =  -gamepad1.right_stick_x * 0.65;
 
-            if(gamepad1.dpad_up){
+            ArmDrive = gamepad2.left_stick_y;
+
+            /*if(gamepad1.dpad_up){
                 ArmDrive = ArmSpeed;
             } else if(gamepad1.dpad_down){
                 ArmDrive = -ArmSpeed;
             }else{
                 ArmDrive = 0;
-            }
+            }*/
             robot.armMotor.setPower(ArmDrive);
 
-            if(gamepad1.left_bumper){
+            if(gamepad2.left_bumper){
                 robot.leftClaw.setPosition(0);
                 robot.rightClaw.setPosition(0);
             }
-            if(gamepad1.right_bumper){
+            if(gamepad2.right_bumper){
                 robot.leftClaw.setPosition(1);
                 robot.rightClaw.setPosition(1);
             }
