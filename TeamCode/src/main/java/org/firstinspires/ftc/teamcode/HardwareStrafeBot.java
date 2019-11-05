@@ -84,6 +84,9 @@ public class HardwareStrafeBot
         rback = hwMap.get(DcMotor.class, "rback");
         //leftArm    = hwMap.get(DcMotor.class, "left_arm");
 
+        lfront.setDirection(DcMotor.Direction.REVERSE);
+        rback.setDirection(DcMotor.Direction.REVERSE);
+
         // Set all motors to zero power
         lfront.setPower(0);
         lback.setPower(0);

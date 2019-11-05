@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -46,12 +48,19 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Dual Joystick", group="StrafeBot")
+@TeleOp(name="StrafeBot OPMode", group="StrafeBot")
 
 public class StrafeBot_Dual extends LinearOpMode {
 
+
+    BNO055IMU imu;
     /* Declare OpMode members. */
     HardwareStrafeBot robot = new HardwareStrafeBot();   // Use a Pushbot's hardware     // sets rate to move servo
+
+
+    public double controlMod(double value){
+        return Math.abs(Math.pow(value,2)) * value;
+    }
 
     @Override
     public void runOpMode() {
@@ -62,6 +71,20 @@ public class StrafeBot_Dual extends LinearOpMode {
          */
         robot.init(hardwareMap);
 
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Say", "Hello Driver");    //
         telemetry.update();
@@ -69,28 +92,34 @@ public class StrafeBot_Dual extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         // run until the end of the match (driver presses STOP)
+
         while (opModeIsActive()) {
 
             //Original code taken from: https://ftcforum.usfirst.org/forum/ftc-technology/android-studio/6361-mecanum-wheels-drive-code-example
-            double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
-            double robotAngle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
-            double rightX = gamepad1.right_stick_x;
-            final double v1 = r * Math.cos(robotAngle) + rightX;
-            final double v2 = r * Math.sin(robotAngle) - rightX;
-            final double v3 = r * Math.sin(robotAngle) + rightX;
-            final double v4 = r * Math.cos(robotAngle) - rightX;
+            double r = Math.hypot(controlMod(gamepad1.right_stick_x), controlMod(gamepad1.left_stick_y));
+            double robotAngle = Math.atan2(controlMod(gamepad1.left_stick_y), controlMod(gamepad1.right_stick_x)) - Math.PI / 4;
+            double rightX = controlMod(gamepad1.left_stick_x);
+            final double v1 = r * Math.cos(robotAngle) + rightX; //LFRONT
+            final double v2 = r * Math.sin(robotAngle) - rightX; //RFRONT
+            final double v3 = r * Math.sin(robotAngle) + rightX; //LBACK
+            final double v4 = r * Math.cos(robotAngle) - rightX; //RBACK
 
-            if(gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2){
+            /*if(gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2){
                 robot.lfront.setPower(-(gamepad1.left_stick_y-0.2));
                 robot.rfront.setPower((gamepad1.left_stick_y-0.2));
                 robot.lback.setPower((gamepad1.left_stick_y-0.2));
                 robot.rback.setPower(-(gamepad1.left_stick_y-0.2));
             }else {
-                robot.lfront.setPower(v1);
-                robot.rfront.setPower(-v2);
-                robot.lback.setPower(v3);
-                robot.rback.setPower(-v4);
-            }
+            robot.lfront.setPower(v1);
+            robot.rfront.setPower(-v2);
+            robot.lback.setPower(v3);
+            robot.rback.setPower(-v4);*/
+            //}
+
+            robot.lfront.setPower(v1);
+            robot.rfront.setPower(v2);
+            robot.lback.setPower(v3);
+            robot.rback.setPower(v4);
             /*if(gamepad1.dpad_up){
                 robot.lfront.setPower(0.5);
             }
@@ -104,6 +133,7 @@ public class StrafeBot_Dual extends LinearOpMode {
                 robot.lback.setPower(0.5);
             }*/
 
+            telemetry.addData("Robot Angle: ", robotAngle);
             telemetry.update();
             // Pace this loop so jaw action is reasonable speed.
             sleep(50);
