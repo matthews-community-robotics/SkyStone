@@ -34,10 +34,11 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 /**
  * This OpMode uses the common Pushbot hardware class to define the devices on the robot.
@@ -53,9 +54,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="StrafeBot OPMode", group="StrafeBot")
+@TeleOp(name="StrafeBot Demonstration OPMode", group="StrafeBot")
 
-public class StrafeBot_Dual extends LinearOpMode {
+public class StrafeBot_Demonstration extends LinearOpMode {
 
 
     /* Declare OpMode members. */
@@ -63,7 +64,8 @@ public class StrafeBot_Dual extends LinearOpMode {
     BNO055IMU imu;
     Orientation angles;
     double gyroAngle;
-    boolean globalMovement = true;
+    boolean globalMovement = false;
+    double speedMod = 0.35;
 
     public double controlMod(double value){
         return Math.abs(value) * value;
@@ -76,6 +78,10 @@ public class StrafeBot_Dual extends LinearOpMode {
         // and save the heading
         double curHeading = angles.firstAngle;
         return curHeading;
+    }
+
+    private double modSpeed(double value){
+        return speedMod * value;
     }
 
     @Override
@@ -133,10 +139,20 @@ public class StrafeBot_Dual extends LinearOpMode {
             final double v4 = r * Math.sin(robotAngle) + rightX; //LBACK
             final double v3 = r * Math.cos(robotAngle) - rightX; //RBACK
 
-            robot.lfront.setPower(v1);
-            robot.rfront.setPower(v2);
-            robot.lback.setPower(v3);
-            robot.rback.setPower(v4);
+            robot.lfront.setPower(modSpeed(v1));
+            robot.rfront.setPower(modSpeed(v2));
+            robot.lback.setPower(modSpeed(v3));
+            robot.rback.setPower(modSpeed(v4));
+
+
+            if(gamepad1.dpad_up) {
+                speedMod+=0.01;
+            }
+            if(gamepad1.dpad_down) {
+                speedMod-=0.01;
+            }
+
+
 
             robot.arm.setPower(gamepad2.left_stick_y*0.8);
 
@@ -147,6 +163,7 @@ public class StrafeBot_Dual extends LinearOpMode {
                 robot.claw.setPosition(1);
             }
 
+            telemetry.addData("Speed Value: ", speedMod);
             telemetry.addData("Robot Angle: ", Math.toDegrees(robotAngle));
             telemetry.addData("Global Angle: ", gyroAngle);
             telemetry.update();

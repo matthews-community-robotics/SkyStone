@@ -29,9 +29,11 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -56,6 +58,8 @@ public class HardwareStrafeBot
     public DcMotor  lback  = null;
     public DcMotor  rfront   = null;
     public DcMotor  rback  = null;
+    public CRServo arm = null;
+    public Servo claw = null;
     //public DcMotor  leftArm     = null;
     //public Servo    rightClaw   = null;
 
@@ -82,6 +86,9 @@ public class HardwareStrafeBot
         lback = hwMap.get(DcMotor.class, "lback");
         rfront  = hwMap.get(DcMotor.class, "rfront");
         rback = hwMap.get(DcMotor.class, "rback");
+        arm = hwMap.get(CRServo.class, "arm");
+
+        claw = hwMap.get(Servo.class, "claw");
         //leftArm    = hwMap.get(DcMotor.class, "left_arm");
 
         lfront.setDirection(DcMotor.Direction.REVERSE);
