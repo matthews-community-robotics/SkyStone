@@ -80,7 +80,7 @@ public class PushbotAutoDriveEncoder extends LinearOpMode {
 
     static final double     COUNTS_PER_MOTOR_REV    = 288;    // eg: TETRIX Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 1.0;     // This is < 1.0 if geared UP
-    static final double     WHEEL_DIAMETER_INCHES   = 3.5;     // For figuring circumference
+    static final double     WHEEL_DIAMETER_INCHES   = 1.22*3.5;     // For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
 
@@ -98,7 +98,7 @@ public class PushbotAutoDriveEncoder extends LinearOpMode {
         this.imu.getPosition();
         // and save the heading
         double curHeading = angles.firstAngle;
-        return curHeading;
+        return -curHeading;
     }
 
     public void turnIMU(boolean isHeading, double degrees, double power){
@@ -108,24 +108,32 @@ public class PushbotAutoDriveEncoder extends LinearOpMode {
         } else{
             targetDegree = checkOrientation() + degrees;
         }
-        if(targetDegree < degrees) {
+
+        if(targetDegree < checkOrientation()) {
+            robot.rightDrive.setPower(power);
+            robot.leftDrive.setPower(-power);
             while (opModeIsActive() && checkOrientation() > targetDegree){
-                robot.rightDrive.setPower(power);
-                robot.leftDrive.setPower(-power);
+                telemetry.addData("Current Degrees: ", checkOrientation());
+                telemetry.addData("Turn Target Degrees: ", targetDegree);
+                telemetry.update();
             }
         }
-        if(targetDegree > degrees) {
+        if(targetDegree > checkOrientation()) {
+            robot.rightDrive.setPower(-power);
+            robot.leftDrive.setPower(power);
             while (opModeIsActive() && checkOrientation() < targetDegree){
-                robot.rightDrive.setPower(-power);
-                robot.leftDrive.setPower(power);
+                telemetry.addData("Current Degrees: ", checkOrientation());
+                telemetry.addData("Turn Target Degrees: ", targetDegree);
+                telemetry.update();
             }
         }
+        robot.rightDrive.setPower(0);
+        robot.leftDrive.setPower(0);
     }
 
 
     public void encoderDrive(double inches,
-                             double speed,
-                             double timeoutS) {
+                             double speed) {
         int newLeftTarget;
         int newRightTarget;
         speed = -speed;
@@ -148,7 +156,6 @@ public class PushbotAutoDriveEncoder extends LinearOpMode {
             robot.rightDrive.setPower(-Math.abs(speed));
 
             while (opModeIsActive() &&
-                    (runtime.seconds() < timeoutS) &&
                     (robot.leftDrive.isBusy() && robot.rightDrive.isBusy())) {
 
 
@@ -167,8 +174,6 @@ public class PushbotAutoDriveEncoder extends LinearOpMode {
             // Turn off RUN_TO_POSITION
             robot.leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-            sleep(5000);   // optional\ pause after each move
         }
     }
 
@@ -199,8 +204,11 @@ public class PushbotAutoDriveEncoder extends LinearOpMode {
         robot.leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        waitForStart();
-        encoderDrive(36, 0.6, 10);
+        waitForStart();;
+        encoderDrive(24,0.6);
+        turnIMU(false, -90, 0.2);
+        encoderDrive(24,0.6);
+        //sleep(1000);
         //turnIMU(false, 90, 0.5);
         //encoderDrive(12,
         //        0.6, 10);
