@@ -71,7 +71,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
  */
 
 @Autonomous(name="Auto", group="Pushbot")
-//@Disabled
+@Disabled
 public class PushbotAutoDriveEncoder extends LinearOpMode {
 
     /* Declare OpMode members. */
@@ -117,8 +117,7 @@ public class PushbotAutoDriveEncoder extends LinearOpMode {
                 telemetry.addData("Turn Target Degrees: ", targetDegree);
                 telemetry.update();
             }
-        }
-        if(targetDegree > checkOrientation()) {
+        }else{
             robot.rightDrive.setPower(-power);
             robot.leftDrive.setPower(power);
             while (opModeIsActive() && checkOrientation() < targetDegree){
